@@ -12,6 +12,7 @@ using Plugin.MediaManager.Abstractions.Implementations;
 using Plugin.MediaManager.ExoPlayer;
 using Plugin.MediaManager;
 using System.Collections.Generic;
+using Plugin.MediaManager.Abstractions.EventArguments;
 
 namespace MediaSample.Droid
 {
@@ -183,6 +184,13 @@ namespace MediaSample.Droid
                 {
                     try
                     {
+                        args.File.MetadataUpdated += (object sender1, MetadataChangedEventArgs e) => {
+                            title.Text = e.MetaData.Title;
+                            subtitle.Text = e.MetaData.Artist;
+                            var cover = FindViewById<ImageView>(Resource.Id.imageview_cover);
+                            cover.SetImageBitmap(e.MetaData.AlbumArt as Bitmap);
+                        };
+
                         if (args.File.Url == ViewModel.Queue.Current.Url)
                         {
                             title.Text = args.File.Metadata.Title;
@@ -196,6 +204,25 @@ namespace MediaSample.Droid
                         Console.WriteLine($"Exception : MediaFileChangedUI: {ex.Message}");
                     }
                 });
+            };
+
+            ViewModel.MediaPlayer.MediaQueue.QueueMediaChanged += (object sender, QueueMediaChangedEventArgs e) => {
+                e.File.MetadataUpdated += (object sender1, MetadataChangedEventArgs args) => {
+                    RunOnUiThread(() =>
+                    {
+                        try
+                        {
+                            title.Text = args.MetaData.Title;
+                            subtitle.Text = args.MetaData.Artist;
+                            var cover = FindViewById<ImageView>(Resource.Id.imageview_cover);
+                            cover.SetImageBitmap(args.MetaData.AlbumArt as Bitmap);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Exception : MediaFileChangedUI: {ex.Message}");
+                        }
+                    });
+                };
             };
 
             ViewModel.Queue.Clear();
