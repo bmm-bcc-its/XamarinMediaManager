@@ -265,6 +265,7 @@ namespace Plugin.MediaManager.Abstractions.Implementations
             if (Index - 1 >= 0)
             {
                 Index--;
+                OnPropertyChanged(nameof(Current));
             }
             else
             {
@@ -277,6 +278,7 @@ namespace Plugin.MediaManager.Abstractions.Implementations
             if (Index + 1 < _queue.Count)
             {
                 Index++;
+                OnPropertyChanged(nameof(Current));
             }
             else
             {
@@ -287,7 +289,10 @@ namespace Plugin.MediaManager.Abstractions.Implementations
         public void SetTrackAsCurrent(IMediaFile item)
         {
             if (_queue.Contains(item))
+            {
                 Index = _queue.IndexOf(item);
+                OnPropertyChanged(nameof(Current));
+            }
         }
 
         private CancellationTokenSource shuffleCancellation = new CancellationTokenSource();
@@ -300,6 +305,8 @@ namespace Plugin.MediaManager.Abstractions.Implementations
             CollectionChangedEventDisabled = false;
             if (CollectionChanged != null)
                 CollectionChanged(_queue, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+
+            OnPropertyChanged(nameof(Current));
         }
 
         private void Shuffle()
