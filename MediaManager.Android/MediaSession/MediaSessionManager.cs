@@ -23,7 +23,10 @@ namespace Plugin.MediaManager.MediaSession
 
         public IMediaNotificationManager NotificationManager
         {
-            get => _overrideNotificationManager ?? _notificationManager;
+            get
+            {
+                return _overrideNotificationManager ?? _notificationManager;
+            }
             set
             {
                 _overrideNotificationManager = value;
